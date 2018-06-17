@@ -61,6 +61,17 @@
             height:250px;
         }
 
+        #cat-links{
+            margin-top:0px;
+            padding:5px 10px 5px 10px;
+        }
+
+        #cat-links >li {
+            padding:15px;
+            cursor: pointer;
+            list-style: none;
+        }
+
     </style>
 </head>
 
@@ -73,19 +84,15 @@
 <section class = "cat-choices">
     <div class = "choices">
         <h4>Choose a cat:</h4>
-        <ul>
-            <li>Cat1</li>
-            <li>Cat2</li>
-            <li>Cat3</li>
-            <li>Cat4</li>
-            <li>Cat5</li>
+        <ul id = "cat-links">
+
         </ul>
     </div>
 </section>
 
 <section class = "cat-section">
     <div class = "cat-image">
-        <img src="img/black-and-white-cat.jpg">
+        <img id = "cat-image" src="img/">
     </div>
     <div class = "cat-stats">
         <h4><span id = "cat-name">Chosen Cat</span></h4>
@@ -95,6 +102,133 @@
 
 
 <script>
+
+/* ========= Model  ==================== */
+
+var model = {
+
+    currentCat: null,
+
+    cats: [
+        {clickCount:0,
+        name: "Larry",
+        imgSrc: "img/black-and-white-cat.jpg"
+        },
+        {clickCount:0,
+        name: "Barry",
+        imgSrc: "img/cat-on-grass.jpg"
+        },
+        {clickCount:0,
+        name: "Sally",
+        imgSrc: "img/calico-cat.jpg"
+        },
+        {clickCount:0,
+        name: "Tolly",
+        imgSrc: "img/multi-cat.jpg"
+        },
+        {clickCount:0,
+        name: "Smolly",
+        imgSrc: "img/plant-cat.jpg"
+        }
+    ],
+}
+
+
+var octopus = {
+
+    init:function(){
+        //set current cat to first one by default.
+        model.currentCat = model.cats[0];
+
+        //init the views
+        catListView.init();
+        catView.init();
+
+    },
+    getCurrentCat: function(){
+        return model.currentCat;
+    },
+    getAllCats: function(){
+        return model.cats;
+    },
+    //set the current cat to the new one passed in.
+    setCurrentCat: function(cat){
+        model.currentCat = cat;
+    },
+
+    counter: function(){
+        model.currentCat.clickCount ++;
+        catView.render();
+    },
+};
+
+
+/* ========= View  ==================== */
+
+var catView = {
+
+    init: function(){
+        //get dom elements to change.
+        this.catElement = document.getElementById("cat-section");
+        this.catNameElement = document.getElementById("cat-name");
+        this.catImageElement = document.getElementById("cat-image");
+        this.countElement = document.getElementById("click-count");
+
+        this.catImageElement.addEventListener("click",function(e){
+            e.preventDefault();
+            octopus.counter();
+        });
+
+        this.render();
+    },
+
+    render: function(){
+        //update dom elements
+        var currentCat = octopus.getCurrentCat();
+
+        this.countElement.textContent = currentCat.clickCount;
+        this.catNameElement.textContent = currentCat.name;
+        this.catImageElement.src = currentCat.imgSrc;
+    }
+};
+
+var catListView = {
+
+    init: function(){
+        this.catListElement = document.getElementById("cat-links");
+        this.render();
+    },
+
+    render: function(){
+        //get all the cats
+        var cats = octopus.getAllCats();
+        this.catListElement.innerHTML = "";
+
+        cats.forEach(cat => {
+
+            var element = document.createElement("li");
+            element.textContent = cat.name;
+
+            //set event
+            //using closure cat.
+            element.addEventListener("click",(function(cat){
+                return function(){
+                    octopus.setCurrentCat(cat);
+                    catView.render();
+                };
+            })(cat));
+
+            this.catListElement.appendChild(element);
+
+        });
+
+    }
+
+};
+
+//start the octopus going!
+octopus.init();
+
 
 </script>
 
